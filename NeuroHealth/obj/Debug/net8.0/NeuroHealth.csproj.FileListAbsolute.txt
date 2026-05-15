@@ -1,0 +1,15 @@
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\bin\Debug\net8.0\NeuroHealth.exe
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\bin\Debug\net8.0\NeuroHealth.deps.json
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\bin\Debug\net8.0\NeuroHealth.runtimeconfig.json
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\bin\Debug\net8.0\NeuroHealth.dll
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\bin\Debug\net8.0\NeuroHealth.pdb
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\obj\Debug\net8.0\NeuroHealth.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\obj\Debug\net8.0\NeuroHealth.AssemblyInfoInputs.cache
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\obj\Debug\net8.0\NeuroHealth.AssemblyInfo.cs
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\obj\Debug\net8.0\NeuroHealth.csproj.CoreCompileInputs.cache
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\obj\Debug\net8.0\NeuroHealth.dll
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\obj\Debug\net8.0\refint\NeuroHealth.dll
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\obj\Debug\net8.0\NeuroHealth.pdb
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\obj\Debug\net8.0\NeuroHealth.genruntimeconfig.cache
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\obj\Debug\net8.0\ref\NeuroHealth.dll
+C:\Users\fperr\source\repos\NeuroHealth\NeuroHealth\obj\Debug\net8.0\NeuroHealth.sourcelink.json
