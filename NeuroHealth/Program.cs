@@ -71,7 +71,7 @@ namespace NeuroHealth
         }
 
         // Sugerencia de modelado: representar al paciente como un registro de datos.
-        // El grupo puede modificar esta representación si lo justifica correctamente.
+        // El grupo puede modificar esta representación si lo justifica correctamente.s
         record Paciente(
             long Dni,
             string NombreApellido,
@@ -101,9 +101,9 @@ namespace NeuroHealth
         // - Pila de observaciones: Stack<Observacion>
 
         // Ejemplo de declaración posible:
-        // static Queue<Paciente> colaEspera = new Queue<Paciente>();
-        // static List<Paciente> pacientesAdmitidos = new List<Paciente>();
-        // static Stack<Observacion> observaciones = new Stack<Observacion>();
+        static Queue<Paciente> colaEspera = new Queue<Paciente>();
+        static List<Paciente> pacientesAdmitidos = new List<Paciente>();
+        static Stack<Observacion> observaciones = new Stack<Observacion>();
 
         #endregion
 
@@ -201,7 +201,43 @@ namespace NeuroHealth
         static void CargarCasosDePrueba()
         {
             // TODO: cargar algunos pacientes en la cola de espera.
+
+            // Ejemplo de signos vitales
+            SignosVitales sv1 = new SignosVitales { Pulso = 80, Temperatura = 36.7, Presion = "120/80", Saturacion = 98, Dolor = 2 };
+            SignosVitales sv2 = new SignosVitales { Pulso = 95, Temperatura = 38.2, Presion = "130/85", Saturacion = 96, Dolor = 5 };
+
+            // Creación de pacientes
+            Paciente paciente1 = new Paciente(
+                12345678,
+                "Juan Pérez",
+                45,
+                MotivoConsulta.DolorAbdominal,
+                sv1,
+                DateTime.Now,
+                NivelUrgencia.SinEvaluar
+            );
+
+            Paciente paciente2 = new Paciente(
+                87654321,
+                "María Gómez",
+                30,
+                MotivoConsulta.Fiebre,
+                sv2,
+                DateTime.Now,
+                NivelUrgencia.SinEvaluar
+            );
+
+            // Encolar pacientes
+            colaEspera.Enqueue(paciente1);
+            colaEspera.Enqueue(paciente2);
+
+
+
             // TODO: cargar algunos pacientes admitidos.
+
+
+
+
             // TODO: cargar algunas observaciones.
             // Esta función es opcional, pero recomendada para probar el sistema.
         }
@@ -220,6 +256,10 @@ namespace NeuroHealth
             // TODO: pedir signos vitales.
             // TODO: crear el paciente con NivelUrgencia.SinEvaluar.
             // TODO: agregarlo a la cola de espera.
+
+
+
+
         }
 
         static bool ExisteDniEnSistema(long dni)
@@ -238,6 +278,13 @@ namespace NeuroHealth
         {
             // TODO: mostrar los pacientes que están esperando evaluación.
             // Debe respetar el orden de llegada.
+            Console.WriteLine("Pacientes en cola de espera:");
+
+            foreach (var paciente in colaEspera)
+            {
+                Console.WriteLine($"DNI: {paciente.Dni}, Nombre: {paciente.NombreApellido}, Edad: {paciente.Edad}, Motivo: {paciente.Motivo}, Nivel: {paciente.Nivel}");
+            }
+
         }
 
         static void EvaluarPaciente()
