@@ -29,11 +29,22 @@ namespace NeuroHealth
          * TODO: explicar cómo organizaron pacientes, cola de espera,
          * pacientes admitidos y observaciones.
          * 
+         * Pacientes al ser la entidad principal lo organizamos como record el cual nos permite tener un registro con los campos 
+         * previamente solicitados, cola de espera como <cola> la cual nos permite estructurar para hacer la atencion por orden de llegada
+         * pacientes adminitos como <lista> ya que tienen criterio de atencion y la lista nos permite seleccionar luego segun criterio
+         * observaciones como <Pila> ya que permite mostrar por orden es decir la ultima primero y la primera al final para que quede en orden las observaciones segun fecha
          * 
          * 
-         *
          * Justificación de estructuras:
          * TODO: explicar por qué usaron List<T>, Queue<T> y Stack<T>.
+         * 
+         * List nos permite ya ingresar por indice por eso la estructura podemos utilizarlas para distintos criterios
+         * Cola nos permite tener un criterio de uso es decir FIFO primero que entra primero que sale, ideal cuando debemos aplicar funciones por orden de llegada
+         * Pila nos permite FILO primero en entrar ultimo en salir, ideal para historial, ya que el ultimo uso es el primero en salir, entonces podemos tener un
+         * historial de atencion estructurado
+         * 
+         * 
+         * 
          *
          * Algoritmo de triaje:
          * TODO: explicar cómo se asignan los niveles Verde, Amarillo y Rojo.
@@ -54,6 +65,8 @@ namespace NeuroHealth
          *   • Dolor 6–8
          *    Nivel Verde
          *   Si no cumple condiciones anteriores.
+         *   
+         *   
          *
          * Recursividad:
          * TODO: explicar qué función recursiva implementaron.
@@ -356,44 +369,25 @@ namespace NeuroHealth
             // TODO: agregarlo a la cola de espera.
 
             // 1. Pedir DNI
-            Console.Write("Ingrese DNI: ");
-            long dni = long.Parse(Console.ReadLine());
+            long dni = LeerDniOCancelar("Ingrese dni: ");
 
-            // 2. Validar que sea positivo y no esté repetido
-            if (dni <= 0)
-            {
-                Console.WriteLine("El DNI debe ser positivo.");
-                return;
-            }
-            if (ExisteDniEnSistema(dni))
-            {
-                Console.WriteLine("El DNI ya existe en el sistema.");
-                return;
-            }
 
-            // 3. Pedir apellido y nombre
-            Console.Write("Ingrese Apellido y Nombre: ");
-            string nombreApellido = Console.ReadLine();
+            // 2. Pedir apellido y nombre
+            string nombreApellido = LeerTextoObligatorio("Ingrese nombre y apellido: ");
 
-            // 4. Pedir edad
-            Console.Write("Ingrese Edad: ");
-            int edad = int.Parse(Console.ReadLine());
+            // 3. Pedir edad
+            int edad = LeerEntero("Ingrese edad: ");
 
-            // 5. Pedir motivo de consulta (ejemplo simple)
-            Console.Write("Ingrese Motivo de consulta (DolorAbdominal/Fiebre/etc): ");
-            MotivoConsulta motivo = Enum.Parse<MotivoConsulta>(Console.ReadLine());
+            // 4. Pedir motivo de consulta (ejemplo simple)
+            MotivoConsulta motivo = LeerMotivoConsulta();
 
-            // 6. Pedir signos vitales
-            Console.Write("Pulso: ");
-            int pulso = int.Parse(Console.ReadLine());
-            Console.Write("Temperatura: ");
-            double temperatura = double.Parse(Console.ReadLine());
-            Console.Write("Presión: ");
-            string presion = Console.ReadLine();
-            Console.Write("Saturación: ");
-            int saturacion = int.Parse(Console.ReadLine());
-            Console.Write("Dolor (0-10): ");
-            int dolor = int.Parse(Console.ReadLine());
+            // 5. Pedir signos vitales
+
+            int pulso = LeerEntero("Pulso: ");
+            double temperatura = LeerDouble("Temperatura: ");
+            string presion = LeerTextoObligatorio("Presion: ");
+            int saturacion = LeerEntero("Saturacion: ");
+            int dolor = LeerEnteroEnRango("Dolor (0-10): ", 1, 10);
 
             SignosVitales signos = new SignosVitales
             {
@@ -443,7 +437,7 @@ namespace NeuroHealth
 
             foreach (var paciente in colaEspera)
             {
-                Console.WriteLine($"DNI: {paciente.Dni}, Nombre: {paciente.NombreApellido}, Edad: {paciente.Edad}, Motivo: {paciente.Motivo}, Nivel: {paciente.Nivel}");
+                MostrarDatosPaciente(paciente);
             }
 
         }
@@ -679,30 +673,94 @@ namespace NeuroHealth
             // TODO: ordenar una copia por DNI.
             // TODO: buscar con búsqueda binaria recursiva.
             // TODO: mostrar cantidad de pasos de cada búsqueda.
+
+            // pide dni busca && permite -1 para volver
+            long dni = LeerDniOCancelar("Ingrese dni: ");
+            if (dni == -1)
+            {
+                return;
+            }
+
+            // búsqueda lineal en pacientes admitidos
+            int pasosLineal = 0;
+            int posicionEnLaLista = BuscarLineal(dni, ref pasosLineal);
+
+            // ordenar una copia por DNI
+            List<Paciente> copiaOrdenada = CopiarListaPacientes();
+            OrdenarPacientesPorDni(copiaOrdenada);
+
+            // búsqueda binaria recursiva en la copia ordenada
+            int pasosBinaria = 0;
+            int posicionBinaria = BuscarBinariaRecursiva(copiaOrdenada, dni, 0, copiaOrdenada.Count - 1, ref pasosBinaria);
+
+            // mostrar resultados
+            Console.WriteLine("=== Resultados de búsqueda ===");
+
+            if (posicionEnLaLista != -1)
+                Console.WriteLine($"Lineal: encontrado {pacientesAdmitidos[posicionEnLaLista].NombreApellido} en {pasosLineal} pasos.");
+            else
+                Console.WriteLine($"Lineal: no encontrado en {pasosLineal} pasos.");
+
+            if (posicionBinaria != -1)
+                Console.WriteLine($"Binaria: encontrado {copiaOrdenada[posicionBinaria].NombreApellido} en {pasosBinaria} pasos.");
+            else
+                Console.WriteLine($"Binaria: no encontrado en {pasosBinaria} pasos.");
+
         }
 
         static int BuscarLineal(long dniBuscado, ref int pasos)
         {
             // TODO: implementar búsqueda lineal en la lista de pacientes admitidos.
-            return -1;
+            pasos = 0;
+
+            for (int i = 0; i < pacientesAdmitidos.Count; i++)
+            {
+                pasos++;
+                if (pacientesAdmitidos[i].Dni == dniBuscado)
+                {
+                    return i; // devuelve la posición en la lista
+                }
+            }
+
+            return -1; // no encontrado
         }
 
         static int BuscarBinariaRecursiva(List<Paciente> listaOrdenada, long dniBuscado, int inicio, int fin, ref int pasos)
         {
             // TODO: implementar búsqueda binaria recursiva.
-            return -1;
+            if (inicio > fin)
+                return -1; // no encontrado
+
+            pasos++;
+
+            int medio = (inicio + fin) / 2;
+
+            if (listaOrdenada[medio].Dni == dniBuscado)
+            {
+                return medio; // devuelve la posición en la lista ordenada
+            }
+            else if (dniBuscado < listaOrdenada[medio].Dni)
+            {
+                return BuscarBinariaRecursiva(listaOrdenada, dniBuscado, inicio, medio - 1, ref pasos);
+            }
+            else
+            {
+                return BuscarBinariaRecursiva(listaOrdenada, dniBuscado, medio + 1, fin, ref pasos);
+            }
         }
 
         static List<Paciente> CopiarListaPacientes()
         {
             // TODO: copiar manualmente la lista de pacientes admitidos.
-            return new List<Paciente>();
+            return new List<Paciente>(pacientesAdmitidos);
         }
 
         static void OrdenarPacientesPorDni(List<Paciente> lista)
         {
             // TODO: ordenar por DNI.
             // Puede utilizarse un algoritmo simple visto en clase.
+
+            lista.Sort((a,b)=> a.Dni.CompareTo(b.Dni));
         }
 
         #endregion
