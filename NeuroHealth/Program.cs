@@ -70,9 +70,26 @@ namespace NeuroHealth
          *
          * Recursividad:
          * TODO: explicar qué función recursiva implementaron.
+         * 
+         * recursividad simple donde el algoritmo tiene el caso base (sirve para cortar la recursion) y luego la suma de resultado llamando a la recursion aumentando el indice
          *
          * Búsquedas:
          * TODO: explicar la búsqueda lineal y la búsqueda binaria recursiva.
+         * 
+         * La busqueda lineal busco desde el indice 0 hasta que lo encuentra, busqueda registro por registro, es la busqueda mas simple, pero compleja para listas grandes.
+         * Complejidad: O(n)
+         *   
+         *   
+         *   
+         * Busqueda binaria recursiva  
+         *   Compara el elemento del medio con el buscado:
+         *       - Si coincide, lo encontró.
+         *       - Si es menor, busca en la mitad izquierda.
+         *       - Si es mayor, busca en la mitad derecha.
+         *           Cada paso reduce el rango a la mitad, lo que la hace mucho más eficiente (O(log n)),
+         *           pero solo es válida si la lista está previamente ordenada.
+         * 
+         * 
          */
 
         #region TIPOS DEL SISTEMA
