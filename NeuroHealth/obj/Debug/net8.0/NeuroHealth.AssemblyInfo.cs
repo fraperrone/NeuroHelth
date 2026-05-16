@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NeuroHealth")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b159ffb35c8391ee2525485d79161e3942168a9d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+71c0194f161ebd05805870860991d2632db9f57b")]
 [assembly: System.Reflection.AssemblyProductAttribute("NeuroHealth")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NeuroHealth")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Numerics;
 
 namespace NeuroHealth
 {
@@ -10,23 +12,48 @@ namespace NeuroHealth
          * PROYECTO: NeuroHealth - Sistema de Triaje de Emergencias
          * ============================================================
          * Integrantes:
-         * -
-         * -
-         * -
-         * -
+         * - Franco Perrone Rey
+         * - Francisco Aguilar
+         * - Demaria Leonel
+         * 
          *
          * Explicación general del programa:
          * TODO: explicar brevemente qué hace el sistema.
+         * 
+         * El sistema es un breve gestor de pacientes, el cual clasifica el estado de estos segun sintomas
+         * registra observaciones medicas, identifica a los mismos, pondera estos segun criterio y tiene un 
+         * breve analisis estadistico
+         * 
          *
          * Organización de datos:
          * TODO: explicar cómo organizaron pacientes, cola de espera,
          * pacientes admitidos y observaciones.
+         * 
+         * 
+         * 
          *
          * Justificación de estructuras:
          * TODO: explicar por qué usaron List<T>, Queue<T> y Stack<T>.
          *
          * Algoritmo de triaje:
          * TODO: explicar cómo se asignan los niveles Verde, Amarillo y Rojo.
+         * 
+         * Los niveles estaan previamente documentados en la consigna y en resumen son los siguientes:
+         * Reglas de Triaje
+         *   El sistema clasificará automáticamente a cada paciente según:
+         *   Nivel Rojo (Crítico)
+         *   • Saturación < 90
+         *   • Pulso > 120
+         *   • Temperatura ≥ 39.0
+         *   • Dolor ≥ 9
+         *    Nivel Amarillo
+         *   (Solo si no fue Rojo)
+         *   • Saturación 90–94
+         *   • Pulso 100–120
+         *   • Temperatura 38–38.9
+         *   • Dolor 6–8
+         *    Nivel Verde
+         *   Si no cumple condiciones anteriores.
          *
          * Recursividad:
          * TODO: explicar qué función recursiva implementaron.
@@ -113,6 +140,7 @@ namespace NeuroHealth
         {
             // TODO: inicializar estructuras si corresponde.
             // TODO: cargar casos de prueba si el grupo decide incluirlos.
+            CargarCasosDePrueba();
 
             bool salir = false;
 
@@ -235,11 +263,80 @@ namespace NeuroHealth
 
             // TODO: cargar algunos pacientes admitidos.
 
+            // Pacientes admitidos de prueba (sin Random)
+            SignosVitales svA = new SignosVitales { Pulso = 120, Temperatura = 39.0, Presion = "140/90", Saturacion = 90, Dolor = 8 };
+            SignosVitales svB = new SignosVitales { Pulso = 75, Temperatura = 36.5, Presion = "118/78", Saturacion = 99, Dolor = 1 };
+            SignosVitales svC = new SignosVitales { Pulso = 95, Temperatura = 37.8, Presion = "125/80", Saturacion = 95, Dolor = 4 };
+
+            // Crear pacientes con SinEvaluar
+            Paciente pacienteA = new Paciente(
+                33445566,
+                "Pedro Ramírez",
+                60,
+                MotivoConsulta.Fiebre,
+                svA,
+                DateTime.Now.AddMinutes(-50),
+                NivelUrgencia.SinEvaluar
+            );
+
+            Paciente pacienteB = new Paciente(
+                77889900,
+                "Lucía Fernández",
+                25,
+                MotivoConsulta.DificultadRespiratoria,
+                svB,
+                DateTime.Now.AddMinutes(-30),
+                NivelUrgencia.SinEvaluar
+            );
+
+            Paciente pacienteC = new Paciente(
+                99112233,
+                "Roberto Díaz",
+                40,
+                MotivoConsulta.PerdidaConocimiento,
+                svC,
+                DateTime.Now.AddMinutes(-20),
+                NivelUrgencia.SinEvaluar
+            );
+
+            // Clasificar con tu función de triaje
+            pacienteA = pacienteA with { Nivel = ClasificarTriaje(svA) };
+            pacienteB = pacienteB with { Nivel = ClasificarTriaje(svB) };
+            pacienteC = pacienteC with { Nivel = ClasificarTriaje(svC) };
+
+            // Agregar a la lista de admitidos
+            pacientesAdmitidos.Add(pacienteA);
+            pacientesAdmitidos.Add(pacienteB);
+            pacientesAdmitidos.Add(pacienteC);
+
+            Console.WriteLine("Pacientes admitidos de prueba cargados correctamente.");
 
 
 
             // TODO: cargar algunas observaciones.
             // Esta función es opcional, pero recomendada para probar el sistema.
+
+            observaciones.Push(new Observacion
+            {
+                DniPaciente = 33445566,
+                Texto = "Paciente con dificultad respiratoria, se indica oxígeno suplementario.",
+                Fecha = DateTime.Now.AddMinutes(-40)
+            });
+
+            observaciones.Push(new Observacion
+            {
+                DniPaciente = 77889900,
+                Texto = "Paciente en control rutinario, signos vitales normales.",
+                Fecha = DateTime.Now.AddMinutes(-30)
+            });
+
+            observaciones.Push(new Observacion
+            {
+                DniPaciente = 99112233,
+                Texto = "Paciente con fiebre persistente, se solicita análisis de laboratorio.",
+                Fecha = DateTime.Now.AddMinutes(-20)
+            });
+
         }
 
         #endregion
@@ -257,7 +354,70 @@ namespace NeuroHealth
             // TODO: crear el paciente con NivelUrgencia.SinEvaluar.
             // TODO: agregarlo a la cola de espera.
 
+            // 1. Pedir DNI
+            Console.Write("Ingrese DNI: ");
+            long dni = long.Parse(Console.ReadLine());
 
+            // 2. Validar que sea positivo y no esté repetido
+            if (dni <= 0)
+            {
+                Console.WriteLine("El DNI debe ser positivo.");
+                return;
+            }
+            if (ExisteDniEnSistema(dni))
+            {
+                Console.WriteLine("El DNI ya existe en el sistema.");
+                return;
+            }
+
+            // 3. Pedir apellido y nombre
+            Console.Write("Ingrese Apellido y Nombre: ");
+            string nombreApellido = Console.ReadLine();
+
+            // 4. Pedir edad
+            Console.Write("Ingrese Edad: ");
+            int edad = int.Parse(Console.ReadLine());
+
+            // 5. Pedir motivo de consulta (ejemplo simple)
+            Console.Write("Ingrese Motivo de consulta (DolorAbdominal/Fiebre/etc): ");
+            MotivoConsulta motivo = Enum.Parse<MotivoConsulta>(Console.ReadLine());
+
+            // 6. Pedir signos vitales
+            Console.Write("Pulso: ");
+            int pulso = int.Parse(Console.ReadLine());
+            Console.Write("Temperatura: ");
+            double temperatura = double.Parse(Console.ReadLine());
+            Console.Write("Presión: ");
+            string presion = Console.ReadLine();
+            Console.Write("Saturación: ");
+            int saturacion = int.Parse(Console.ReadLine());
+            Console.Write("Dolor (0-10): ");
+            int dolor = int.Parse(Console.ReadLine());
+
+            SignosVitales signos = new SignosVitales
+            {
+                Pulso = pulso,
+                Temperatura = temperatura,
+                Presion = presion,
+                Saturacion = saturacion,
+                Dolor = dolor
+            };
+
+            // 7. Crear el paciente con NivelUrgencia.SinEvaluar
+            Paciente nuevo = new Paciente(
+                dni,
+                nombreApellido,
+                edad,
+                motivo,
+                signos,
+                DateTime.Now,
+                NivelUrgencia.SinEvaluar
+            );
+
+            // 8. Agregarlo a la cola de espera
+            colaEspera.Enqueue(nuevo);
+
+            Console.WriteLine($"Paciente {nombreApellido} agregado a la cola de espera.");
 
 
         }
@@ -293,6 +453,28 @@ namespace NeuroHealth
             // TODO: quitar el primer paciente de la cola.
             // TODO: clasificarlo con las reglas de triaje.
             // TODO: agregarlo a la lista de pacientes admitidos.
+
+            // 1. Verificamos si hay paciente en espera
+            if (colaEspera.Count == 0)
+            {
+                Console.WriteLine("No hay pacientes en la cola de espera.");
+                return;
+            }
+
+            // 2. Quitar el primer paciente de la cola
+            Paciente paciente = colaEspera.Dequeue();
+
+            // 3. Clasificarlo con las reglas de triaje
+            NivelUrgencia nivel = ClasificarTriaje(paciente.Signos);
+
+            // Crear una nueva instancia con el nivel asignado
+            Paciente pacienteClasificado = paciente with { Nivel = nivel };
+
+            // 4. Agregarlo a la lista de pacientes admitidos
+            pacientesAdmitidos.Add(pacienteClasificado);
+
+            Console.WriteLine($"Paciente {pacienteClasificado.NombreApellido} admitido con nivel {pacienteClasificado.Nivel}.");
+        
         }
 
         static NivelUrgencia ClasificarTriaje(SignosVitales signos)
@@ -301,6 +483,44 @@ namespace NeuroHealth
             // Rojo: Saturación < 90, Pulso > 120, Temperatura >= 39, Dolor >= 9.
             // Amarillo: si no es rojo y cumple reglas intermedias.
             // Verde: si no cumple condiciones anteriores.
+
+            // Reglas Reglas de Triaje
+            //  El sistema clasificará automáticamente a cada paciente según:
+            //  Nivel Rojo(Crítico)
+            //• Saturación < 90
+            //• Pulso > 120
+            //• Temperatura ≥ 39.0
+            //• Dolor ≥ 9
+            // Nivel Amarillo
+            // (Solo si no fue Rojo)
+            //• Saturación 90–94
+            //• Pulso 100–120
+            //• Temperatura 38–38.9
+            //• Dolor 6–8
+            // Nivel Verde
+            //Si no cumple condiciones anteriores.
+
+            // Nivel Rojo (estricto: todas las condiciones críticas deben cumplirse)
+            if (signos.Saturacion < 90 &&
+                signos.Pulso > 120 &&
+                signos.Temperatura >= 39.0 &&
+                signos.Dolor >= 9)
+            {
+                return NivelUrgencia.Rojo;
+            }
+
+            // Nivel Amarillo (todas las condiciones intermedias deben cumplirse)
+            if ((signos.Saturacion >= 90 && signos.Saturacion <= 94) &&
+                (signos.Pulso >= 100 && signos.Pulso <= 120) &&
+                (signos.Temperatura >= 38.0 && signos.Temperatura <= 38.9) &&
+                (signos.Dolor >= 6 && signos.Dolor <= 8))
+            {
+                return NivelUrgencia.Amarillo;
+            }
+
+            // Nivel Verde (si no cumple las anteriores)
+            return NivelUrgencia.Verde;
+
 
             return NivelUrgencia.SinEvaluar;
         }
@@ -316,6 +536,39 @@ namespace NeuroHealth
             // TODO: validar que el paciente exista en admitidos.
             // TODO: pedir texto de observación.
             // TODO: agregar observación a la pila.
+            Console.Write("Ingrese DNI del paciente admitido (-1 para volver): ");
+            long dni = long.Parse(Console.ReadLine());
+
+            // Permitir volver
+            if (dni == -1)
+            {
+                Console.WriteLine("Operación cancelada.");
+                return;
+            }
+
+            // Validar que el paciente exista en admitidos
+            Paciente paciente = pacientesAdmitidos.FirstOrDefault(p => p.Dni == dni);
+            if (paciente == null)
+            {
+                Console.WriteLine("No se encontró un paciente admitido con ese DNI.");
+                return;
+            }
+
+            // Pedir texto de observación
+            Console.Write("Ingrese texto de observación: ");
+            string texto = Console.ReadLine();
+
+            // Crear observación y agregarla a la pila
+            Observacion obs = new Observacion
+            {
+                DniPaciente = dni,
+                Texto = texto,
+                Fecha = DateTime.Now
+            };
+
+            observaciones.Push(obs);
+
+            Console.WriteLine("Observación registrada correctamente.");
         }
 
         static void MostrarObservaciones()
@@ -323,6 +576,36 @@ namespace NeuroHealth
             // TODO: pedir DNI del paciente.
             // TODO: permitir -1 para volver.
             // TODO: mostrar observaciones desde la más reciente a la más antigua.
+
+
+            Console.Write("Ingrese DNI del paciente (-1 para volver): ");
+            long dni = long.Parse(Console.ReadLine());
+
+            // Permitir volver
+            if (dni == -1)
+            {
+                Console.WriteLine("Operación cancelada.");
+                return;
+            }
+
+            // Validar que el paciente exista en admitidos
+            Paciente paciente = pacientesAdmitidos.FirstOrDefault(p => p.Dni == dni);
+            if (paciente == null)
+            {
+                Console.WriteLine("No se encontró un paciente admitido con ese DNI.");
+                return;
+            }
+
+            // Mostrar observaciones asociadas al paciente
+            Console.WriteLine($"Observaciones para {paciente.NombreApellido}:");
+
+            foreach (var obs in observaciones)
+            {
+                if (obs.DniPaciente == dni)
+                {
+                    Console.WriteLine($"[{obs.Fecha}] {obs.Texto}");
+                }
+            }
         }
 
         #endregion
@@ -332,11 +615,47 @@ namespace NeuroHealth
         static void ListarPacientesAdmitidos()
         {
             // TODO: mostrar DNI, nombre, edad, motivo y nivel de urgencia.
+
+            if (pacientesAdmitidos.Count == 0)
+            {
+                Console.WriteLine("No hay pacientes admitidos.");
+                return;
+            }
+
+            Console.WriteLine("Listado de pacientes admitidos:");
+            Console.WriteLine("---------------------------------------------------");
+
+            foreach (var paciente in pacientesAdmitidos)
+            {
+                Console.WriteLine($"DNI: {paciente.Dni}");
+                Console.WriteLine($"Nombre: {paciente.NombreApellido}");
+                Console.WriteLine($"Edad: {paciente.Edad}");
+                Console.WriteLine($"Motivo: {paciente.Motivo}");
+                Console.WriteLine($"Nivel de urgencia: {paciente.Nivel}");
+                Console.WriteLine("---------------------------------------------------");
+            }
+
         }
 
         static void MostrarDatosPaciente(Paciente paciente)
         {
             // TODO: mostrar los datos de un paciente de manera clara.
+            Console.WriteLine("=======================================");
+            Console.WriteLine($"DNI: {paciente.Dni}");
+            Console.WriteLine($"Nombre: {paciente.NombreApellido}");
+            Console.WriteLine($"Edad: {paciente.Edad}");
+            Console.WriteLine($"Motivo de consulta: {paciente.Motivo}");
+            Console.WriteLine($"Fecha de ingreso: {paciente.FechaIngreso}");
+            Console.WriteLine($"Nivel de urgencia: {paciente.Nivel}");
+            Console.WriteLine("---- Signos Vitales ----");
+            Console.WriteLine($"Pulso: {paciente.Signos.Pulso}");
+            Console.WriteLine($"Temperatura: {paciente.Signos.Temperatura}");
+            Console.WriteLine($"Presión: {paciente.Signos.Presion}");
+            Console.WriteLine($"Saturación: {paciente.Signos.Saturacion}");
+            Console.WriteLine($"Dolor: {paciente.Signos.Dolor}");
+            Console.WriteLine("=======================================");
+
+
         }
 
         static void FiltrarPorUrgencia()
@@ -344,6 +663,49 @@ namespace NeuroHealth
             // TODO: pedir nivel de urgencia.
             // TODO: permitir -1 para volver.
             // TODO: mostrar pacientes admitidos que coincidan con el nivel seleccionado.
+
+            Console.WriteLine("Seleccione nivel de urgencia:");
+            Console.WriteLine("0 - SinEvaluar");
+            Console.WriteLine("1 - Verde");
+            Console.WriteLine("2 - Amarillo");
+            Console.WriteLine("3 - Rojo");
+            Console.WriteLine("-1 - Volver");
+
+            int opcion = int.Parse(Console.ReadLine());
+
+            // Permitir volver
+            if (opcion == -1)
+            {
+                Console.WriteLine("Operación cancelada.");
+                return;
+            }
+
+            // Validar opción
+            if (opcion < 0 || opcion > 3)
+            {
+                Console.WriteLine("Nivel inválido.");
+                return;
+            }
+
+            NivelUrgencia nivelSeleccionado = (NivelUrgencia)opcion;
+
+            // Filtrar pacientes admitidos
+            var filtrados = pacientesAdmitidos.Where(p => p.Nivel == nivelSeleccionado).ToList();
+
+            if (filtrados.Count == 0)
+            {
+                Console.WriteLine($"No hay pacientes admitidos con nivel {nivelSeleccionado}.");
+                return;
+            }
+
+            Console.WriteLine($"Pacientes admitidos con nivel {nivelSeleccionado}:");
+            Console.WriteLine("---------------------------------------------------");
+
+            foreach (var paciente in filtrados)
+            {
+                Console.WriteLine($"DNI: {paciente.Dni} | Nombre: {paciente.NombreApellido} | Edad: {paciente.Edad} | Motivo: {paciente.Motivo}");
+            }
+
         }
 
         #endregion
@@ -426,47 +788,175 @@ namespace NeuroHealth
         static int LeerEntero(string mensaje)
         {
             // TODO: implementar lectura segura de enteros con TryParse.
-            Console.Write(mensaje);
-            return int.Parse(Console.ReadLine());
+            int valor;
+            bool valido = false;
+
+            do
+            {
+                Console.Write(mensaje);
+                string entrada = Console.ReadLine();
+
+                if (int.TryParse(entrada, out valor))
+                {
+                    valido = true; // conversión exitosa
+                }
+                else
+                {
+                    Console.WriteLine("Entrada inválida. Ingrese un número entero válido.");
+                }
+
+            } while (!valido);
+
+            return valor;
         }
 
         static long LeerLong(string mensaje)
         {
             // TODO: implementar lectura segura de long con TryParse.
-            Console.Write(mensaje);
-            return long.Parse(Console.ReadLine());
+            long valor;
+            bool valido = false;
+
+            do
+            {
+                Console.Write(mensaje);
+                string entrada = Console.ReadLine();
+
+                if (long.TryParse(entrada, out valor))
+                {
+                    valido = true; // conversión exitosa
+                }
+                else
+                {
+                    Console.WriteLine("Entrada inválida. Ingrese un número entero largo válido.");
+                }
+
+            } while (!valido);
+
+            return valor;
         }
 
         static double LeerDouble(string mensaje)
         {
             // TODO: implementar lectura segura de double con TryParse.
-            Console.Write(mensaje);
-            return double.Parse(Console.ReadLine());
+            double valor;
+            bool valido = false;
+
+            do
+            {
+                Console.Write(mensaje);
+                string entrada = Console.ReadLine();
+
+                if (double.TryParse(entrada, out valor))
+                {
+                    valido = true; // conversión exitosa
+                }
+                else
+                {
+                    Console.WriteLine("Entrada inválida. Ingrese un número válido.");
+                }
+
+            } while (!valido);
+
+            return valor;
         }
 
         static string LeerTextoObligatorio(string mensaje)
         {
             // TODO: impedir que el texto quede vacío.
-            Console.Write(mensaje);
-            return Console.ReadLine();
+            string texto;
+            do
+            {
+                Console.Write(mensaje);
+                texto = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(texto))
+                {
+                    Console.WriteLine("El texto no puede quedar vacío. Intente nuevamente.");
+                }
+
+            } while (string.IsNullOrWhiteSpace(texto));
+
+            return texto;
         }
 
         static int LeerEnteroEnRango(string mensaje, int minimo, int maximo)
         {
             // TODO: validar que el valor esté entre mínimo y máximo.
-            return LeerEntero(mensaje);
+            int valor;
+            bool valido = false;
+
+            do
+            {
+                valor = LeerEntero(mensaje); // usa tu método seguro con TryParse
+
+                if (valor < minimo || valor > maximo)
+                {
+                    Console.WriteLine($"El valor debe estar entre {minimo} y {maximo}. Intente nuevamente.");
+                }
+                else
+                {
+                    valido = true;
+                }
+
+            } while (!valido);
+
+            return valor;
         }
 
         static double LeerDoubleEnRango(string mensaje, double minimo, double maximo)
         {
             // TODO: validar que el valor esté entre mínimo y máximo.
-            return LeerDouble(mensaje);
+            double valor;
+            bool valido = false;
+
+            do
+            {
+                valor = LeerDouble(mensaje); // usa tu método seguro con TryParse
+
+                if (valor < minimo || valor > maximo)
+                {
+                    Console.WriteLine($"El valor debe estar entre {minimo} y {maximo}. Intente nuevamente.");
+                }
+                else
+                {
+                    valido = true;
+                }
+
+            } while (!valido);
+
+            return valor;
         }
 
         static long LeerDniOCancelar(string mensaje)
         {
             // TODO: permitir DNI positivo o -1 para volver.
-            return LeerLong(mensaje);
+            long valor;
+            bool valido = false;
+
+            do
+            {
+                Console.Write(mensaje);
+                string entrada = Console.ReadLine();
+
+                if (long.TryParse(entrada, out valor))
+                {
+                    if (valor > 0 || valor == -1)
+                    {
+                        valido = true; // aceptamos DNI positivo o -1
+                    }
+                    else
+                    {
+                        Console.WriteLine("El DNI debe ser positivo o -1 para volver.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Entrada inválida. Ingrese un número válido.");
+                }
+
+            } while (!valido);
+
+            return valor;
         }
 
         static int LeerEnteroEnRangoOCancelar(string mensaje, int minimo, int maximo)
