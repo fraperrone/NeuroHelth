@@ -147,6 +147,7 @@ namespace NeuroHealth
             while (!salir)
             {
                 MostrarMenu();
+               
                 int opcion = LeerEntero("Seleccione una opción: ");
 
                 switch (opcion)
@@ -474,7 +475,7 @@ namespace NeuroHealth
             pacientesAdmitidos.Add(pacienteClasificado);
 
             Console.WriteLine($"Paciente {pacienteClasificado.NombreApellido} admitido con nivel {pacienteClasificado.Nivel}.");
-        
+
         }
 
         static NivelUrgencia ClasificarTriaje(SignosVitales signos)
@@ -779,255 +780,298 @@ namespace NeuroHealth
             // TODO: mostrar cantidad por nivel de urgencia.
             // TODO: calcular edad promedio.
             // TODO: calcular porcentaje de pacientes críticos.
+         
+                Console.WriteLine("=== Estadísticas del sistema ===");
+
+                // Cantidad de pacientes en espera
+                Console.WriteLine($"Pacientes en espera: {colaEspera.Count}");
+
+                // Cantidad de pacientes admitidos
+                Console.WriteLine($"Pacientes admitidos: {pacientesAdmitidos.Count}");
+
+                // Cantidad por nivel de urgencia
+                int verdes = pacientesAdmitidos.Count(p => p.Nivel == NivelUrgencia.Verde);
+                int amarillos = pacientesAdmitidos.Count(p => p.Nivel == NivelUrgencia.Amarillo);
+                int rojos = pacientesAdmitidos.Count(p => p.Nivel == NivelUrgencia.Rojo);
+
+                Console.WriteLine($"Verde: {verdes}");
+                Console.WriteLine($"Amarillo: {amarillos}");
+                Console.WriteLine($"Rojo: {rojos}");
+
+                // Edad promedio
+                if (pacientesAdmitidos.Any())
+                {
+                    double edadPromedio = pacientesAdmitidos.Average(p => p.Edad);
+                    Console.WriteLine($"Edad promedio: {edadPromedio:F1} años");
+                }
+                else
+                {
+                    Console.WriteLine("Edad promedio: N/A");
+                }
+
+                // Porcentaje de pacientes críticos
+                if (pacientesAdmitidos.Any())
+                {
+                    double porcentajeCriticos = (double)rojos / pacientesAdmitidos.Count * 100;
+                    Console.WriteLine($"Porcentaje críticos: {porcentajeCriticos:F1}%");
+                }
+                else
+                {
+                    Console.WriteLine("Porcentaje críticos: N/A");
+                }
+
+                Console.WriteLine("================================");
         }
 
-        #endregion
+            #endregion
 
         #region FUNCIONES DE LECTURA Y VALIDACIÓN
 
-        static int LeerEntero(string mensaje)
-        {
-            // TODO: implementar lectura segura de enteros con TryParse.
-            int valor;
-            bool valido = false;
 
-            do
+       static int LeerEntero(string mensaje)
             {
-                Console.Write(mensaje);
-                string entrada = Console.ReadLine();
+                // TODO: implementar lectura segura de enteros con TryParse.
+                int valor;
+                bool valido = false;
 
-                if (int.TryParse(entrada, out valor))
+                do
                 {
-                    valido = true; // conversión exitosa
-                }
-                else
-                {
-                    Console.WriteLine("Entrada inválida. Ingrese un número entero válido.");
-                }
+                    Console.Write(mensaje);
+                    string entrada = Console.ReadLine();
 
-            } while (!valido);
-
-            return valor;
-        }
-
-        static long LeerLong(string mensaje)
-        {
-            // TODO: implementar lectura segura de long con TryParse.
-            long valor;
-            bool valido = false;
-
-            do
-            {
-                Console.Write(mensaje);
-                string entrada = Console.ReadLine();
-
-                if (long.TryParse(entrada, out valor))
-                {
-                    valido = true; // conversión exitosa
-                }
-                else
-                {
-                    Console.WriteLine("Entrada inválida. Ingrese un número entero largo válido.");
-                }
-
-            } while (!valido);
-
-            return valor;
-        }
-
-        static double LeerDouble(string mensaje)
-        {
-            // TODO: implementar lectura segura de double con TryParse.
-            double valor;
-            bool valido = false;
-
-            do
-            {
-                Console.Write(mensaje);
-                string entrada = Console.ReadLine();
-
-                if (double.TryParse(entrada, out valor))
-                {
-                    valido = true; // conversión exitosa
-                }
-                else
-                {
-                    Console.WriteLine("Entrada inválida. Ingrese un número válido.");
-                }
-
-            } while (!valido);
-
-            return valor;
-        }
-
-        static string LeerTextoObligatorio(string mensaje)
-        {
-            // TODO: impedir que el texto quede vacío.
-            string texto;
-            do
-            {
-                Console.Write(mensaje);
-                texto = Console.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(texto))
-                {
-                    Console.WriteLine("El texto no puede quedar vacío. Intente nuevamente.");
-                }
-
-            } while (string.IsNullOrWhiteSpace(texto));
-
-            return texto;
-        }
-
-        static int LeerEnteroEnRango(string mensaje, int minimo, int maximo)
-        {
-            // TODO: validar que el valor esté entre mínimo y máximo.
-            int valor;
-            bool valido = false;
-
-            do
-            {
-                valor = LeerEntero(mensaje); // usa tu método seguro con TryParse
-
-                if (valor < minimo || valor > maximo)
-                {
-                    Console.WriteLine($"El valor debe estar entre {minimo} y {maximo}. Intente nuevamente.");
-                }
-                else
-                {
-                    valido = true;
-                }
-
-            } while (!valido);
-
-            return valor;
-        }
-
-        static double LeerDoubleEnRango(string mensaje, double minimo, double maximo)
-        {
-            // TODO: validar que el valor esté entre mínimo y máximo.
-            double valor;
-            bool valido = false;
-
-            do
-            {
-                valor = LeerDouble(mensaje); // usa tu método seguro con TryParse
-
-                if (valor < minimo || valor > maximo)
-                {
-                    Console.WriteLine($"El valor debe estar entre {minimo} y {maximo}. Intente nuevamente.");
-                }
-                else
-                {
-                    valido = true;
-                }
-
-            } while (!valido);
-
-            return valor;
-        }
-
-        static long LeerDniOCancelar(string mensaje)
-        {
-            // TODO: permitir DNI positivo o -1 para volver.
-            long valor;
-            bool valido = false;
-
-            do
-            {
-                Console.Write(mensaje);
-                string entrada = Console.ReadLine();
-
-                if (long.TryParse(entrada, out valor))
-                {
-                    if (valor > 0 || valor == -1)
+                    if (int.TryParse(entrada, out valor))
                     {
-                        valido = true; // aceptamos DNI positivo o -1
+                        valido = true; // conversión exitosa
                     }
                     else
                     {
-                        Console.WriteLine("El DNI debe ser positivo o -1 para volver.");
+                        Console.WriteLine("Entrada inválida. Ingrese un número entero válido.");
                     }
-                }
-                else
-                {
-                    Console.WriteLine("Entrada inválida. Ingrese un número válido.");
-                }
 
-            } while (!valido);
+                } while (!valido);
 
-            return valor;
-        }
-
-        static int LeerEnteroEnRangoOCancelar(string mensaje, int minimo, int maximo)
-        {
-            // TODO: permitir un valor entre mínimo y máximo o -1 para volver.
-            int valor;
-            bool valido = false;
-
-            do
-            {
-                valor = LeerEntero(mensaje); // usa tu método seguro con TryParse
-
-                if ((valor >= minimo && valor <= maximo) || valor == -1)
-                {
-                    valido = true; // aceptamos dentro del rango o -1
-                }
-                else
-                {
-                    Console.WriteLine($"El valor debe estar entre {minimo} y {maximo}, o -1 para volver.");
-                }
-
-            } while (!valido);
-
-            return valor;
-        }
-
-        static MotivoConsulta LeerMotivoConsulta()
-        {
-            // TODO: mostrar menú de motivos de consulta.
-            // TODO: validar opción entre 1 y 8.
-            Console.WriteLine("Seleccione motivo de consulta:");
-            Console.WriteLine("1. Dolor torácico");
-            Console.WriteLine("2. Dificultad respiratoria");
-            Console.WriteLine("3. Fiebre");
-            Console.WriteLine("4. Dolor abdominal");
-            Console.WriteLine("5. Traumatismo");
-            Console.WriteLine("6. Pérdida de conocimiento");
-            Console.WriteLine("7. Cefalea");
-            Console.WriteLine("8. Control general");
-            Console.WriteLine("(-1 para volver)");
-
-            int opcion = LeerEnteroEnRangoOCancelar("Opción: ", 1, 8);
-
-            if (opcion == -1)
-            {
-                
-                throw new OperationCanceledException("El usuario eligió volver.");
+                return valor;
             }
 
-            return (MotivoConsulta)opcion;
-        }
-
-        static NivelUrgencia LeerNivelUrgencia()
-        {
-            // TODO: mostrar niveles Verde, Amarillo, Rojo y opción -1 para volver.
-            Console.WriteLine("Seleccione nivel de urgencia:");
-            Console.WriteLine("1. Verde");
-            Console.WriteLine("2. Amarillo");
-            Console.WriteLine("3. Rojo");
-            Console.WriteLine("(-1 para volver)");
-
-            int opcion = LeerEnteroEnRangoOCancelar("Opción: ", 1, 3);
-
-            if (opcion == -1)
+            static long LeerLong(string mensaje)
             {
-                throw new OperationCanceledException("El usuario eligio volver");
+                // TODO: implementar lectura segura de long con TryParse.
+                long valor;
+                bool valido = false;
+
+                do
+                {
+                    Console.Write(mensaje);
+                    string entrada = Console.ReadLine();
+
+                    if (long.TryParse(entrada, out valor))
+                    {
+                        valido = true; // conversión exitosa
+                    }
+                    else
+                    {
+                        Console.WriteLine("Entrada inválida. Ingrese un número entero largo válido.");
+                    }
+
+                } while (!valido);
+
+                return valor;
             }
 
-            return (NivelUrgencia)opcion;
-        }
+            static double LeerDouble(string mensaje)
+            {
+                // TODO: implementar lectura segura de double con TryParse.
+                double valor;
+                bool valido = false;
 
-        #endregion
+                do
+                {
+                    Console.Write(mensaje);
+                    string entrada = Console.ReadLine();
+
+                    if (double.TryParse(entrada, out valor))
+                    {
+                        valido = true; // conversión exitosa
+                    }
+                    else
+                    {
+                        Console.WriteLine("Entrada inválida. Ingrese un número válido.");
+                    }
+
+                } while (!valido);
+
+                return valor;
+            }
+
+            static string LeerTextoObligatorio(string mensaje)
+            {
+                // TODO: impedir que el texto quede vacío.
+                string texto;
+                do
+                {
+                    Console.Write(mensaje);
+                    texto = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(texto))
+                    {
+                        Console.WriteLine("El texto no puede quedar vacío. Intente nuevamente.");
+                    }
+
+                } while (string.IsNullOrWhiteSpace(texto));
+
+                return texto;
+            }
+
+            static int LeerEnteroEnRango(string mensaje, int minimo, int maximo)
+            {
+                // TODO: validar que el valor esté entre mínimo y máximo.
+                int valor;
+                bool valido = false;
+
+                do
+                {
+                    valor = LeerEntero(mensaje); // usa tu método seguro con TryParse
+
+                    if (valor < minimo || valor > maximo)
+                    {
+                        Console.WriteLine($"El valor debe estar entre {minimo} y {maximo}. Intente nuevamente.");
+                    }
+                    else
+                    {
+                        valido = true;
+                    }
+
+                } while (!valido);
+
+                return valor;
+            }
+
+            static double LeerDoubleEnRango(string mensaje, double minimo, double maximo)
+            {
+                // TODO: validar que el valor esté entre mínimo y máximo.
+                double valor;
+                bool valido = false;
+
+                do
+                {
+                    valor = LeerDouble(mensaje); // usa tu método seguro con TryParse
+
+                    if (valor < minimo || valor > maximo)
+                    {
+                        Console.WriteLine($"El valor debe estar entre {minimo} y {maximo}. Intente nuevamente.");
+                    }
+                    else
+                    {
+                        valido = true;
+                    }
+
+                } while (!valido);
+
+                return valor;
+            }
+
+            static long LeerDniOCancelar(string mensaje)
+            {
+                // TODO: permitir DNI positivo o -1 para volver.
+                long valor;
+                bool valido = false;
+
+                do
+                {
+                    Console.Write(mensaje);
+                    string entrada = Console.ReadLine();
+
+                    if (long.TryParse(entrada, out valor))
+                    {
+                        if (valor > 0 || valor == -1)
+                        {
+                            valido = true; // aceptamos DNI positivo o -1
+                        }
+                        else
+                        {
+                            Console.WriteLine("El DNI debe ser positivo o -1 para volver.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Entrada inválida. Ingrese un número válido.");
+                    }
+
+                } while (!valido);
+
+                return valor;
+            }
+
+            static int LeerEnteroEnRangoOCancelar(string mensaje, int minimo, int maximo)
+            {
+                // TODO: permitir un valor entre mínimo y máximo o -1 para volver.
+                int valor;
+                bool valido = false;
+
+                do
+                {
+                    valor = LeerEntero(mensaje); // usa tu método seguro con TryParse
+
+                    if ((valor >= minimo && valor <= maximo) || valor == -1)
+                    {
+                        valido = true; // aceptamos dentro del rango o -1
+                    }
+                    else
+                    {
+                        Console.WriteLine($"El valor debe estar entre {minimo} y {maximo}, o -1 para volver.");
+                    }
+
+                } while (!valido);
+
+                return valor;
+            }
+
+            static MotivoConsulta LeerMotivoConsulta()
+            {
+                // TODO: mostrar menú de motivos de consulta.
+                // TODO: validar opción entre 1 y 8.
+                Console.WriteLine("Seleccione motivo de consulta:");
+                Console.WriteLine("1. Dolor torácico");
+                Console.WriteLine("2. Dificultad respiratoria");
+                Console.WriteLine("3. Fiebre");
+                Console.WriteLine("4. Dolor abdominal");
+                Console.WriteLine("5. Traumatismo");
+                Console.WriteLine("6. Pérdida de conocimiento");
+                Console.WriteLine("7. Cefalea");
+                Console.WriteLine("8. Control general");
+                Console.WriteLine("(-1 para volver)");
+
+                int opcion = LeerEnteroEnRangoOCancelar("Opción: ", 1, 8);
+
+                if (opcion == -1)
+                {
+
+                    throw new OperationCanceledException("El usuario eligió volver.");
+                }
+
+                return (MotivoConsulta)opcion;
+            }
+
+            static NivelUrgencia LeerNivelUrgencia()
+            {
+                // TODO: mostrar niveles Verde, Amarillo, Rojo y opción -1 para volver.
+                Console.WriteLine("Seleccione nivel de urgencia:");
+                Console.WriteLine("1. Verde");
+                Console.WriteLine("2. Amarillo");
+                Console.WriteLine("3. Rojo");
+                Console.WriteLine("(-1 para volver)");
+
+                int opcion = LeerEnteroEnRangoOCancelar("Opción: ", 1, 3);
+
+                if (opcion == -1)
+                {
+                    throw new OperationCanceledException("El usuario eligio volver");
+                }
+
+                return (NivelUrgencia)opcion;
+            }
+
+            #endregion
     }
 }
+
