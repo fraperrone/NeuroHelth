@@ -962,20 +962,70 @@ namespace NeuroHealth
         static int LeerEnteroEnRangoOCancelar(string mensaje, int minimo, int maximo)
         {
             // TODO: permitir un valor entre mínimo y máximo o -1 para volver.
-            return LeerEntero(mensaje);
+            int valor;
+            bool valido = false;
+
+            do
+            {
+                valor = LeerEntero(mensaje); // usa tu método seguro con TryParse
+
+                if ((valor >= minimo && valor <= maximo) || valor == -1)
+                {
+                    valido = true; // aceptamos dentro del rango o -1
+                }
+                else
+                {
+                    Console.WriteLine($"El valor debe estar entre {minimo} y {maximo}, o -1 para volver.");
+                }
+
+            } while (!valido);
+
+            return valor;
         }
 
         static MotivoConsulta LeerMotivoConsulta()
         {
             // TODO: mostrar menú de motivos de consulta.
             // TODO: validar opción entre 1 y 8.
-            return MotivoConsulta.ControlGeneral;
+            Console.WriteLine("Seleccione motivo de consulta:");
+            Console.WriteLine("1. Dolor torácico");
+            Console.WriteLine("2. Dificultad respiratoria");
+            Console.WriteLine("3. Fiebre");
+            Console.WriteLine("4. Dolor abdominal");
+            Console.WriteLine("5. Traumatismo");
+            Console.WriteLine("6. Pérdida de conocimiento");
+            Console.WriteLine("7. Cefalea");
+            Console.WriteLine("8. Control general");
+            Console.WriteLine("(-1 para volver)");
+
+            int opcion = LeerEnteroEnRangoOCancelar("Opción: ", 1, 8);
+
+            if (opcion == -1)
+            {
+                
+                throw new OperationCanceledException("El usuario eligió volver.");
+            }
+
+            return (MotivoConsulta)opcion;
         }
 
         static NivelUrgencia LeerNivelUrgencia()
         {
             // TODO: mostrar niveles Verde, Amarillo, Rojo y opción -1 para volver.
-            return NivelUrgencia.SinEvaluar;
+            Console.WriteLine("Seleccione nivel de urgencia:");
+            Console.WriteLine("1. Verde");
+            Console.WriteLine("2. Amarillo");
+            Console.WriteLine("3. Rojo");
+            Console.WriteLine("(-1 para volver)");
+
+            int opcion = LeerEnteroEnRangoOCancelar("Opción: ", 1, 3);
+
+            if (opcion == -1)
+            {
+                throw new OperationCanceledException("El usuario eligio volver");
+            }
+
+            return (NivelUrgencia)opcion;
         }
 
         #endregion
