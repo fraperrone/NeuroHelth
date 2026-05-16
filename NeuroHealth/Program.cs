@@ -224,7 +224,9 @@ namespace NeuroHealth
 
         static bool ExisteDniEnSistema(long dni)
         {
-            // TODO: verificar si el DNI existe en la cola o en la lista de admitidos.
+            // TODO: verificar si el DNI existe en la cola o en la lista de admitidos
+            if (colaEspera.Any(p => p.Dni == dni)) { return true; }
+            if (pacientesAdmitidos.Any(p => p.Dni == dni)) { return true; }
             return false;
         }
 
