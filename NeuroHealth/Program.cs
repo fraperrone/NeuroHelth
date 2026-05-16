@@ -777,12 +777,40 @@ namespace NeuroHealth
             // 3 = dolor
             // TODO: llamar a la función recursiva.
             // TODO: mostrar puntaje total e interpretación.
+
+
+            int[] puntajes = new int[4];
+
+            Console.WriteLine("Ingrese puntajes entre 0 y 10:");
+
+            puntajes[0] = LeerEnteroEnRango("Temperatura: ", 0, 10);
+            puntajes[1] = LeerEnteroEnRango("Pulso: ", 0, 10);
+            puntajes[2] = LeerEnteroEnRango("Saturación: ", 0, 10);
+            puntajes[3] = LeerEnteroEnRango("Dolor: ", 0, 10);
+
+            // llamada recursiva
+            int total = SumarPuntajesRecursivo(puntajes, 0);
+
+            Console.WriteLine($"Puntaje total: {total}");
+
+            // interpretación con nuevos criterios
+            if (total >= 0 && total <= 14)
+                Console.WriteLine("Interpretación: Riesgo bajo.");
+            else if (total >= 15 && total <= 29)
+                Console.WriteLine("Interpretación: Riesgo medio.");
+            else if (total >= 30 && total <= 40)
+                Console.WriteLine("Interpretación: Riesgo alto.");
+            else
+                Console.WriteLine("Interpretación: fuera de rango.");
         }
 
         static int SumarPuntajesRecursivo(int[] puntajes, int indice)
         {
             // TODO: implementar suma recursiva del arreglo.
-            return 0;
+            if (indice >= puntajes.Length)
+                return 0;
+
+            return puntajes[indice] + SumarPuntajesRecursivo(puntajes, indice + 1);
         }
 
         #endregion
