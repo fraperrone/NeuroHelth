@@ -537,16 +537,9 @@ namespace NeuroHealth
             // TODO: validar que el paciente exista en admitidos.
             // TODO: pedir texto de observación.
             // TODO: agregar observación a la pila.
-            Console.Write("Ingrese DNI del paciente admitido (-1 para volver): ");
-            long dni = long.Parse(Console.ReadLine());
 
-            // Permitir volver
-            if (dni == -1)
-            {
-                Console.WriteLine("Operación cancelada.");
-                return;
-            }
-
+            long dni = LeerDniOCancelar("Ingrese DNI: ");
+       
             // Validar que el paciente exista en admitidos
             Paciente paciente = pacientesAdmitidos.FirstOrDefault(p => p.Dni == dni);
             if (paciente == null)
@@ -555,9 +548,8 @@ namespace NeuroHealth
                 return;
             }
 
-            // Pedir texto de observación
-            Console.Write("Ingrese texto de observación: ");
-            string texto = Console.ReadLine();
+            // Pedir texto de observación - utilizamos la funcion creada para obligatoriedad.
+            string texto = LeerTextoObligatorio("Ingrese observacion: ");
 
             // Crear observación y agregarla a la pila
             Observacion obs = new Observacion
@@ -579,15 +571,7 @@ namespace NeuroHealth
             // TODO: mostrar observaciones desde la más reciente a la más antigua.
 
 
-            Console.Write("Ingrese DNI del paciente (-1 para volver): ");
-            long dni = long.Parse(Console.ReadLine());
-
-            // Permitir volver
-            if (dni == -1)
-            {
-                Console.WriteLine("Operación cancelada.");
-                return;
-            }
+            long dni = LeerDniOCancelar("Ingrese dni: ");
 
             // Validar que el paciente exista en admitidos
             Paciente paciente = pacientesAdmitidos.FirstOrDefault(p => p.Dni == dni);
@@ -628,12 +612,8 @@ namespace NeuroHealth
 
             foreach (var paciente in pacientesAdmitidos)
             {
-                Console.WriteLine($"DNI: {paciente.Dni}");
-                Console.WriteLine($"Nombre: {paciente.NombreApellido}");
-                Console.WriteLine($"Edad: {paciente.Edad}");
-                Console.WriteLine($"Motivo: {paciente.Motivo}");
-                Console.WriteLine($"Nivel de urgencia: {paciente.Nivel}");
-                Console.WriteLine("---------------------------------------------------");
+                // utilizamos metodo definido para mostrar pacientes
+                MostrarDatosPaciente(paciente);
             }
 
         }
@@ -665,30 +645,8 @@ namespace NeuroHealth
             // TODO: permitir -1 para volver.
             // TODO: mostrar pacientes admitidos que coincidan con el nivel seleccionado.
 
-            Console.WriteLine("Seleccione nivel de urgencia:");
-            Console.WriteLine("0 - SinEvaluar");
-            Console.WriteLine("1 - Verde");
-            Console.WriteLine("2 - Amarillo");
-            Console.WriteLine("3 - Rojo");
-            Console.WriteLine("-1 - Volver");
-
-            int opcion = int.Parse(Console.ReadLine());
-
-            // Permitir volver
-            if (opcion == -1)
-            {
-                Console.WriteLine("Operación cancelada.");
-                return;
-            }
-
-            // Validar opción
-            if (opcion < 0 || opcion > 3)
-            {
-                Console.WriteLine("Nivel inválido.");
-                return;
-            }
-
-            NivelUrgencia nivelSeleccionado = (NivelUrgencia)opcion;
+            // utilizamos funciones pre definidas - en este caso de lectura de nivelurgencia           
+            NivelUrgencia nivelSeleccionado = LeerNivelUrgencia();
 
             // Filtrar pacientes admitidos
             var filtrados = pacientesAdmitidos.Where(p => p.Nivel == nivelSeleccionado).ToList();
@@ -704,7 +662,7 @@ namespace NeuroHealth
 
             foreach (var paciente in filtrados)
             {
-                Console.WriteLine($"DNI: {paciente.Dni} | Nombre: {paciente.NombreApellido} | Edad: {paciente.Edad} | Motivo: {paciente.Motivo}");
+                MostrarDatosPaciente(paciente);
             }
 
         }
@@ -853,7 +811,7 @@ namespace NeuroHealth
                 return valor;
             }
 
-            static long LeerLong(string mensaje)
+       static long LeerLong(string mensaje)
             {
                 // TODO: implementar lectura segura de long con TryParse.
                 long valor;
@@ -878,7 +836,7 @@ namespace NeuroHealth
                 return valor;
             }
 
-            static double LeerDouble(string mensaje)
+       static double LeerDouble(string mensaje)
             {
                 // TODO: implementar lectura segura de double con TryParse.
                 double valor;
@@ -903,7 +861,7 @@ namespace NeuroHealth
                 return valor;
             }
 
-            static string LeerTextoObligatorio(string mensaje)
+       static string LeerTextoObligatorio(string mensaje)
             {
                 // TODO: impedir que el texto quede vacío.
                 string texto;
@@ -922,7 +880,7 @@ namespace NeuroHealth
                 return texto;
             }
 
-            static int LeerEnteroEnRango(string mensaje, int minimo, int maximo)
+       static int LeerEnteroEnRango(string mensaje, int minimo, int maximo)
             {
                 // TODO: validar que el valor esté entre mínimo y máximo.
                 int valor;
@@ -946,7 +904,7 @@ namespace NeuroHealth
                 return valor;
             }
 
-            static double LeerDoubleEnRango(string mensaje, double minimo, double maximo)
+       static double LeerDoubleEnRango(string mensaje, double minimo, double maximo)
             {
                 // TODO: validar que el valor esté entre mínimo y máximo.
                 double valor;
@@ -970,7 +928,7 @@ namespace NeuroHealth
                 return valor;
             }
 
-            static long LeerDniOCancelar(string mensaje)
+       static long LeerDniOCancelar(string mensaje)
             {
                 // TODO: permitir DNI positivo o -1 para volver.
                 long valor;
@@ -1002,7 +960,7 @@ namespace NeuroHealth
                 return valor;
             }
 
-            static int LeerEnteroEnRangoOCancelar(string mensaje, int minimo, int maximo)
+       static int LeerEnteroEnRangoOCancelar(string mensaje, int minimo, int maximo)
             {
                 // TODO: permitir un valor entre mínimo y máximo o -1 para volver.
                 int valor;
@@ -1026,7 +984,7 @@ namespace NeuroHealth
                 return valor;
             }
 
-            static MotivoConsulta LeerMotivoConsulta()
+       static MotivoConsulta LeerMotivoConsulta()
             {
                 // TODO: mostrar menú de motivos de consulta.
                 // TODO: validar opción entre 1 y 8.
@@ -1052,7 +1010,7 @@ namespace NeuroHealth
                 return (MotivoConsulta)opcion;
             }
 
-            static NivelUrgencia LeerNivelUrgencia()
+       static NivelUrgencia LeerNivelUrgencia()
             {
                 // TODO: mostrar niveles Verde, Amarillo, Rojo y opción -1 para volver.
                 Console.WriteLine("Seleccione nivel de urgencia:");
@@ -1071,7 +1029,7 @@ namespace NeuroHealth
                 return (NivelUrgencia)opcion;
             }
 
-            #endregion
+       #endregion
     }
 }
 
